@@ -6,6 +6,8 @@ import 'package:responsive_builder/src/sizing_information.dart';
 import 'device_screen_type.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
+typedef SizingInfoWidgetBuilder = Widget Function(
+    BuildContext, SizingInformation);
 
 /// A widget with a builder that provides you with the sizingInformation
 ///
@@ -94,10 +96,10 @@ class OrientationLayoutBuilder extends StatelessWidget {
 class ScreenTypeLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
 
-  final WidgetBuilder? watch;
-  final WidgetBuilder mobile;
-  final WidgetBuilder? tablet;
-  final WidgetBuilder? desktop;
+  final SizingInfoWidgetBuilder? watch;
+  final SizingInfoWidgetBuilder mobile;
+  final SizingInfoWidgetBuilder? tablet;
+  final SizingInfoWidgetBuilder? desktop;
 
   ScreenTypeLayout({
     Key? key,
@@ -121,8 +123,8 @@ class ScreenTypeLayout extends StatelessWidget {
     this.desktop,
   }) : super(key: key);
 
-  static WidgetBuilder? _builderOrNull(Widget? widget) {
-    return widget == null ? null : ((_) => widget);
+  static SizingInfoWidgetBuilder? _builderOrNull(Widget? widget) {
+    return widget == null ? null : ((context, sizingInformation) => widget);
   }
 
   @override
@@ -133,22 +135,22 @@ class ScreenTypeLayout extends StatelessWidget {
         // If we're at desktop size
         if (sizingInformation.deviceScreenType == DeviceScreenType.desktop) {
           // If we have supplied the desktop layout then display that
-          if (desktop != null) return desktop!(context);
+          if (desktop != null) return desktop!(context, sizingInformation);
           // If no desktop layout is supplied we want to check if we have the size below it and display that
-          if (tablet != null) return tablet!(context);
+          if (tablet != null) return tablet!(context, sizingInformation);
         }
 
         if (sizingInformation.deviceScreenType == DeviceScreenType.tablet) {
-          if (tablet != null) return tablet!(context);
+          if (tablet != null) return tablet!(context, sizingInformation);
         }
 
         if (sizingInformation.deviceScreenType == DeviceScreenType.watch &&
             watch != null) {
-          return watch!(context);
+          return watch!(context, sizingInformation);
         }
 
         // If none of the layouts above are supplied or we're on the mobile layout then we show the mobile layout
-        return mobile(context);
+        return mobile(context, sizingInformation);
       },
     );
   }
@@ -165,10 +167,10 @@ class ScreenTypeLayout extends StatelessWidget {
 class RefinedLayoutBuilder extends StatelessWidget {
   final RefinedBreakpoints? refinedBreakpoints;
 
-  final WidgetBuilder? extraLarge;
-  final WidgetBuilder? large;
-  final WidgetBuilder normal;
-  final WidgetBuilder? small;
+  final SizingInfoWidgetBuilder? extraLarge;
+  final SizingInfoWidgetBuilder? large;
+  final SizingInfoWidgetBuilder normal;
+  final SizingInfoWidgetBuilder? small;
 
   const RefinedLayoutBuilder({
     Key? key,
@@ -187,25 +189,26 @@ class RefinedLayoutBuilder extends StatelessWidget {
         // If we're at extra large size
         if (sizingInformation.refinedSize == RefinedSize.extraLarge) {
           // If we have supplied the extra large layout then display that
-          if (extraLarge != null) return extraLarge!(context);
+          if (extraLarge != null)
+            return extraLarge!(context, sizingInformation);
           // If no extra large layout is supplied we want to check if we have the size below it and display that
-          if (large != null) return large!(context);
+          if (large != null) return large!(context, sizingInformation);
         }
 
         if (sizingInformation.refinedSize == RefinedSize.large) {
           // If we have supplied the large layout then display that
-          if (large != null) return large!(context);
+          if (large != null) return large!(context, sizingInformation);
           // If no large layout is supplied we want to check if we have the size below it and display that
-          return normal(context);
+          return normal(context, sizingInformation);
         }
 
         if (sizingInformation.refinedSize == RefinedSize.small) {
           // If we have supplied the small layout then display that
-          if (small != null) return small!(context);
+          if (small != null) return small!(context, sizingInformation);
         }
 
         // If none of the layouts above are supplied or we're on the small size layout then we show the small layout
-        return normal(context);
+        return normal(context, sizingInformation);
       },
     );
   }
