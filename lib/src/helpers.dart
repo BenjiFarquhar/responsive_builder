@@ -196,6 +196,36 @@ T getValueForScreenType<T>({
   return mobile;
 }
 
+/// Will return one of the values passed in for the device it's running on
+T getValueForSizingInfo<T>({
+  required BuildContext context,
+  required SizingInformation sizingInformation,
+  required T mobile,
+  T? tablet,
+  T? desktop,
+  T? watch,
+}) {
+  var deviceScreenType = sizingInformation.deviceScreenType;
+  // If we're at desktop size
+  if (deviceScreenType == DeviceScreenType.desktop) {
+    // If we have supplied the desktop layout then display that
+    if (desktop != null) return desktop;
+    // If no desktop layout is supplied we want to check if we have the size below it and display that
+    if (tablet != null) return tablet;
+  }
+
+  if (deviceScreenType == DeviceScreenType.tablet) {
+    if (tablet != null) return tablet;
+  }
+
+  if (deviceScreenType == DeviceScreenType.watch && watch != null) {
+    return watch;
+  }
+
+  // If none of the layouts above are supplied or we're on the mobile layout then we show the mobile layout
+  return mobile;
+}
+
 /// Will return one of the values passed in for the refined size
 T getValueForRefinedSize<T>({
   required BuildContext context,
