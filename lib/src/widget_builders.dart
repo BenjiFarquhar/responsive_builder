@@ -1,9 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_builder/src/helpers.dart';
-import 'package:responsive_builder/src/sizing_information.dart';
 
-import 'device_screen_type.dart';
+import '../responsive_builder.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
 typedef SizingInfoWidgetBuilder = Widget Function(
@@ -101,6 +98,9 @@ class ScreenTypeLayout extends StatelessWidget {
   final SizingInfoWidgetBuilder? tablet;
   final SizingInfoWidgetBuilder? desktop;
 
+  @Deprecated(
+    'Use ScreenTypeLayout.builder instead for performance improvements',
+  )
   ScreenTypeLayout({
     Key? key,
     this.breakpoints,
@@ -112,19 +112,33 @@ class ScreenTypeLayout extends StatelessWidget {
         this.mobile = _builderOrNull(mobile)!,
         this.tablet = _builderOrNull(tablet),
         this.desktop = _builderOrNull(desktop),
-        super(key: key);
+        super(key: key) {
+    _checkIfMobileOrDesktopIsSupplied();
+  }
 
-  const ScreenTypeLayout.builder({
+  ScreenTypeLayout.builder({
     Key? key,
     this.breakpoints,
     this.watch,
-    required this.mobile,
+    this.mobile,
     this.tablet,
     this.desktop,
-  }) : super(key: key);
+  }) : super(key: key) {
+    _checkIfMobileOrDesktopIsSupplied();
+  }
 
-  static SizingInfoWidgetBuilder? _builderOrNull(Widget? widget) {
-    return widget == null ? null : ((context, sizingInformation) => widget);
+  void _checkIfMobileOrDesktopIsSupplied() {
+    final hasMobileLayout = mobile != null;
+    final hasDesktopLayout = desktop != null;
+
+    assert(
+      hasMobileLayout || hasDesktopLayout,
+      'You should supply either a mobile layout or a desktop layout. If you don\'t need two layouts then remove this widget and use the widget you want to use directly. ',
+    );
+  }
+
+  static WidgetBuilder? _builderOrNull(Widget? widget) {
+    return widget == null ? null : ((_) => widget);
   }
 
   @override
@@ -149,8 +163,15 @@ class ScreenTypeLayout extends StatelessWidget {
           return watch!(context, sizingInformation);
         }
 
-        // If none of the layouts above are supplied or we're on the mobile layout then we show the mobile layout
-        return mobile(context, sizingInformation);
+        if (sizingInformation.deviceScreenType == DeviceScreenType.mobile) {
+          if (mobile != null) return mobile!(context);
+        }
+
+        // If none of the layouts above are supplied we use the prefered layout based on the flag
+        final buildDesktopLayout =
+            ResponsiveAppUtil.preferDesktop && desktop != null;
+
+        return buildDesktopLayout ? desktop!(context) : mobile!(context);
       },
     );
   }

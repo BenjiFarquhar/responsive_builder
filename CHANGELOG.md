@@ -1,3 +1,44 @@
+## 0.7.0
+
+- Fixes #50
+
+## 0.6.4
+
+- Fixes #48
+
+## 0.6.3
+
+- Fixes bug with preferDesktop and `getValueForScreenType`
+
+## 0.6.2
+
+- Fixes bug with preferDesktop where it always returns desktop UI even if there is a mobile UI.
+
+## 0.6.1
+
+- Adds `preferDesktop` to `ResponsiveApp` which tells the builders that if there's no layout supplied for the current size prefer the desktop over the mobileLayout. Default value is `false` to maintain mobile first behaviour.
+
+## 0.6.0
+
+### New Feature
+Adds responsive sizing by using the `ResponsiveApp` widget at the highest level which allows:
+- Using `20.screenHeight` / `number.screenHeight` shorthand to get the percentage of the Screen Height
+- The same exists for the `screenWidth`
+- There are also shorthand extensions for both. `screenHeight` => `sh` and `screenWidth` => `sw`
+
+## 0.5.1
+
+- Adds checks to ensure desktop returns as Flutter web
+
+## 0.5.0+1
+
+- Adds banner to readme
+
+## 0.5.0
+
+### New Feature
+Adds the `ScrollTransform` functionality which allows you to more easily create scroll effects based on the scrolling position.
+
 ## 0.4.3
 
 - Added small size for getValueForRefinedSize

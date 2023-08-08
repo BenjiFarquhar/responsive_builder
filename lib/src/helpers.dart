@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +12,7 @@ DeviceScreenType getDeviceType(
 ]) {
   double deviceWidth = size.shortestSide;
 
-  if (kIsWeb) {
+  if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
     deviceWidth = size.width;
   }
 
@@ -192,8 +194,14 @@ T getValueForScreenType<T>({
     return watch;
   }
 
-  // If none of the layouts above are supplied or we're on the mobile layout then we show the mobile layout
-  return mobile;
+  if (deviceScreenType == DeviceScreenType.mobile) {
+    if (mobile != null) return mobile;
+  }
+
+  // If none of the layouts above are supplied we use the prefered layout based on the flag
+  final buildDesktopLayout = ResponsiveAppUtil.preferDesktop && desktop != null;
+
+  return buildDesktopLayout ? desktop : mobile;
 }
 
 /// Will return one of the values passed in for the device it's running on
