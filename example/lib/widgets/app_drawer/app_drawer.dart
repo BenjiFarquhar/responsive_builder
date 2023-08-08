@@ -1,7 +1,7 @@
-import 'package:example/widgets/drawer_option/drawer_option.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import '../drawer_option/drawer_option.dart';
 import 'app_drawer_mobile.dart';
 import 'app_drawer_tablet.dart';
 
@@ -11,8 +11,8 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenTypeLayout.builder(
-      mobile: (_) => AppDrawerMobile(),
-      tablet: (_) => OrientationLayoutBuilder(
+      mobile: (_, s) => AppDrawerMobile(),
+      tablet: (_, s) => OrientationLayoutBuilder(
         portrait: (context) => AppDrawerTabletPortrait(),
         landscape: (context) => AppDrawerTabletLandscape(),
       ),

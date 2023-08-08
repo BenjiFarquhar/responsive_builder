@@ -1,6 +1,7 @@
-import 'package:example/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+
+import 'views/home/home_view.dart';
 
 void main() => runApp(MyApp());
 

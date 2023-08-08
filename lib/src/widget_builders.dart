@@ -94,7 +94,7 @@ class ScreenTypeLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
 
   final SizingInfoWidgetBuilder? watch;
-  final SizingInfoWidgetBuilder mobile;
+  final SizingInfoWidgetBuilder? mobile;
   final SizingInfoWidgetBuilder? tablet;
   final SizingInfoWidgetBuilder? desktop;
 
@@ -137,8 +137,8 @@ class ScreenTypeLayout extends StatelessWidget {
     );
   }
 
-  static WidgetBuilder? _builderOrNull(Widget? widget) {
-    return widget == null ? null : ((_) => widget);
+  static SizingInfoWidgetBuilder? _builderOrNull(Widget? widget) {
+    return widget == null ? null : ((c, s) => widget);
   }
 
   @override
@@ -164,14 +164,14 @@ class ScreenTypeLayout extends StatelessWidget {
         }
 
         if (sizingInformation.deviceScreenType == DeviceScreenType.mobile) {
-          if (mobile != null) return mobile!(context);
+          if (mobile != null) return mobile!(context, sizingInformation);
         }
 
         // If none of the layouts above are supplied we use the prefered layout based on the flag
         final buildDesktopLayout =
             ResponsiveAppUtil.preferDesktop && desktop != null;
 
-        return buildDesktopLayout ? desktop!(context) : mobile!(context);
+        return buildDesktopLayout ? desktop!(context, sizingInformation) : mobile!(context, sizingInformation);
       },
     );
   }
