@@ -92,86 +92,48 @@ class OrientationLayoutBuilder extends StatelessWidget {
 /// [desktop] will be built if width is greater than 950
 class ScreenTypeLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
-
-  final SizingInfoWidgetBuilder? watch;
-  final SizingInfoWidgetBuilder? mobile;
-  final SizingInfoWidgetBuilder? tablet;
-  final SizingInfoWidgetBuilder? desktop;
+  final SizingInfoWidgetBuilder mobile;
+  final SizingInfoWidgetBuilder tabletPortrait;
+  final SizingInfoWidgetBuilder desktop;
 
   @Deprecated(
     'Use ScreenTypeLayout.builder instead for performance improvements',
   )
   ScreenTypeLayout({
-    Key? key,
+    super.key,
     this.breakpoints,
-    Widget? watch,
     required Widget mobile,
-    Widget? tablet,
-    Widget? desktop,
-  })  : this.watch = _builderOrNull(watch),
-        this.mobile = _builderOrNull(mobile)!,
-        this.tablet = _builderOrNull(tablet),
-        this.desktop = _builderOrNull(desktop),
-        super(key: key) {
-    _checkIfMobileOrDesktopIsSupplied();
-  }
+    required Widget tabletPortrait,
+    required Widget desktop,
+  })  : 
+        this.mobile = ((c, s) => mobile),
+        this.tabletPortrait = ((c, s) => tabletPortrait),
+        this.desktop = ((c, s) => desktop);
 
   ScreenTypeLayout.builder({
-    Key? key,
+    super.key,
     this.breakpoints,
-    this.watch,
-    this.mobile,
-    this.tablet,
-    this.desktop,
-  }) : super(key: key) {
-    _checkIfMobileOrDesktopIsSupplied();
-  }
-
-  void _checkIfMobileOrDesktopIsSupplied() {
-    final hasMobileLayout = mobile != null;
-    final hasDesktopLayout = desktop != null;
-
-    assert(
-      hasMobileLayout || hasDesktopLayout,
-      'You should supply either a mobile layout or a desktop layout. If you don\'t need two layouts then remove this widget and use the widget you want to use directly. ',
-    );
-  }
-
-  static SizingInfoWidgetBuilder? _builderOrNull(Widget? widget) {
-    return widget == null ? null : ((c, s) => widget);
-  }
+    required this.mobile,
+    required this.tabletPortrait,
+    required this.desktop,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       breakpoints: breakpoints,
       builder: (context, sizingInformation) {
-        // If we're at desktop size
-        if (sizingInformation.deviceScreenType == DeviceScreenType.desktop) {
-          // If we have supplied the desktop layout then display that
-          if (desktop != null) return desktop!(context, sizingInformation);
-          // If no desktop layout is supplied we want to check if we have the size below it and display that
-          if (tablet != null) return tablet!(context, sizingInformation);
+        final orientation = MediaQuery.orientationOf(context);
+
+        if (sizingInformation.deviceScreenType == DeviceScreenType.desktop || sizingInformation.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
+          return desktop(context, sizingInformation);
         }
 
-        if (sizingInformation.deviceScreenType == DeviceScreenType.tablet) {
-          if (tablet != null) return tablet!(context, sizingInformation);
+        if (sizingInformation.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
+          return tabletPortrait(context, sizingInformation);
         }
 
-        if (sizingInformation.deviceScreenType == DeviceScreenType.watch &&
-            watch != null) {
-          return watch!(context, sizingInformation);
-        }
-
-        if (sizingInformation.deviceScreenType == DeviceScreenType.mobile) {
-          if (mobile != null) return mobile!(context, sizingInformation);
-        }
-
-        // If none of the layouts above are supplied we use the prefered layout based on the flag
-        final buildDesktopLayout =
-            ResponsiveAppUtil.preferDesktop && desktop != null;
-
-        return buildDesktopLayout ? desktop!(context, sizingInformation) : mobile!(context, sizingInformation);
+        return mobile(context, sizingInformation);
       },
     );
   }
