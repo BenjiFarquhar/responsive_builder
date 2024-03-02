@@ -89,12 +89,12 @@ class OrientationLayoutBuilder extends StatelessWidget {
 /// [watch] will be built and shown when width is less than 300
 /// [mobile] will be built when width greater than 300
 /// [tablet] will be built when width is greater than 600
-/// [desktop] will be built if width is greater than 950
+/// [desktopTabletLandscape] will be built if width is greater than 950
 class ScreenTypeLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
   final SizingInfoWidgetBuilder mobile;
   final SizingInfoWidgetBuilder tabletPortrait;
-  final SizingInfoWidgetBuilder desktop;
+  final SizingInfoWidgetBuilder desktopTabletLandscape;
 
   @Deprecated(
     'Use ScreenTypeLayout.builder instead for performance improvements',
@@ -104,18 +104,18 @@ class ScreenTypeLayout extends StatelessWidget {
     this.breakpoints,
     required Widget mobile,
     required Widget tabletPortrait,
-    required Widget desktop,
+    required Widget desktopTabletLandscape,
   })  : 
         this.mobile = ((c, s) => mobile),
         this.tabletPortrait = ((c, s) => tabletPortrait),
-        this.desktop = ((c, s) => desktop);
+        this.desktopTabletLandscape = ((c, s) => desktopTabletLandscape);
 
   ScreenTypeLayout.builder({
     super.key,
     this.breakpoints,
     required this.mobile,
     required this.tabletPortrait,
-    required this.desktop,
+    required this.desktopTabletLandscape,
   });
 
   @override
@@ -126,7 +126,7 @@ class ScreenTypeLayout extends StatelessWidget {
         final orientation = MediaQuery.orientationOf(context);
 
         if (sizingInformation.deviceScreenType == DeviceScreenType.desktop || sizingInformation.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
-          return desktop(context, sizingInformation);
+          return desktopTabletLandscape(context, sizingInformation);
         }
 
         if (sizingInformation.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
