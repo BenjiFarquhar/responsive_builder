@@ -39,24 +39,27 @@ class SizingInformation {
     return 'DeviceType:$deviceScreenType RefinedSize:$refinedSize ScreenSize:$screenSize LocalWidgetSize:$localWidgetSize';
   }
 
-    static const _maxColumnWidthDesktop = {
-    RefinedSize.small: 450,
-    RefinedSize.normal: 500,
-    RefinedSize.large: 550,
-    RefinedSize.extraLarge: 600,
-  };
   static const _maxColumnWidthMobile = {
-    RefinedSize.small: 500,
-    RefinedSize.normal: 500,
-    RefinedSize.large: 500,
+    RefinedSize.small: 470,
+    RefinedSize.normal: 480,
+    RefinedSize.large: 490,
     RefinedSize.extraLarge: 500,
   };
+
   static const _maxColumnWidthTablet = {
-    RefinedSize.small: 450,
-    RefinedSize.normal: 510,
-    RefinedSize.large: 520,
-    RefinedSize.extraLarge: 530,
+    RefinedSize.small: 510,
+    RefinedSize.normal: 520,
+    RefinedSize.large: 530,
+    RefinedSize.extraLarge: 540,
   };
+
+  static const _maxColumnWidthDesktop = {
+    RefinedSize.small: 550,
+    RefinedSize.normal: 560,
+    RefinedSize.large: 570,
+    RefinedSize.extraLarge: 580,
+  };
+
   static const RefinedBreakpoints customRefinedBreakpoints = RefinedBreakpoints(
     // Desktop
     desktopExtraLarge: 1800,
@@ -354,4 +357,3 @@ class SizeUtils {
     return deviceType;
   }
 }
-
