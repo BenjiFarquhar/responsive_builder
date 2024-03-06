@@ -207,13 +207,13 @@ T getValueForScreenType<T>({
 /// Will return one of the values passed in for the device it's running on
 T getValueForSizingInfo<T>({
   required BuildContext context,
-  required SizingInformation sizingInformation,
+  required SizeInfo sizeInfo,
   required T mobile,
   T? tablet,
   T? desktop,
   T? watch,
 }) {
-  var deviceScreenType = sizingInformation.deviceScreenType;
+  var deviceScreenType = sizeInfo.deviceScreenType;
   // If we're at desktop size
   if (deviceScreenType == DeviceScreenType.desktop) {
     // If we have supplied the desktop layout then display that

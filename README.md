@@ -20,7 +20,7 @@ responsive_builder:
 
 ## Usage
 
-This package provides a widget called `ResponsiveBuilder` that provides you with a builder function that returns the current `SizingInformation`. The `SizingInformation` includes the `DeviceScreenType`, `screenSize` and `localWidgetSize`. This can be used for fine grained responsive control from a view level down to per widget responsive level.
+This package provides a widget called `ResponsiveBuilder` that provides you with a builder function that returns the current `SizeInfo`. The `SizeInfo` includes the `DeviceScreenType`, `screenSize` and `localWidgetSize`. This can be used for fine grained responsive control from a view level down to per widget responsive level.
 
 ### Responsive Builder
 
@@ -32,17 +32,17 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 // Use the widget
 ResponsiveBuilder(
-    builder: (context, sizingInformation) {
+    builder: (context, sizeInfo) {
       // Check the sizing information here and return your UI
-          if (sizingInformation.deviceScreenType == DeviceScreenType.desktop) {
+          if (sizeInfo.deviceScreenType == DeviceScreenType.desktop) {
           return Container(color:Colors.blue);
         }
 
-        if (sizingInformation.deviceScreenType == DeviceScreenType.tablet) {
+        if (sizeInfo.deviceScreenType == DeviceScreenType.tablet) {
           return Container(color:Colors.red);
         }
 
-        if (sizingInformation.deviceScreenType == DeviceScreenType.watch) {
+        if (sizeInfo.deviceScreenType == DeviceScreenType.watch) {
           return Container(color:Colors.yellow);
         }
 

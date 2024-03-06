@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart' hide WidgetBuilder;
 
 /// Contains sizing information to make responsive choices for the current screen
-class SizingInformation {
+class SizeInfo {
   final DeviceScreenType deviceScreenType;
   final RefinedSize refinedSize;
   final Size screenSize;
@@ -27,12 +27,23 @@ class SizingInformation {
 
   bool get isSmall => refinedSize == RefinedSize.small;
 
-  SizingInformation({
+  const SizeInfo({
     required this.deviceScreenType,
     required this.refinedSize,
     required this.screenSize,
     required this.localWidgetSize,
   });
+
+  factory SizeInfo.fromContext(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+
+    return SizeInfo(
+      deviceScreenType: getDeviceType(size),
+      refinedSize: getRefinedSize(size),
+      screenSize: size,
+      localWidgetSize: const Size(0, 0),
+    );
+  }
 
   @override
   String toString() {
@@ -77,24 +88,23 @@ class SizingInformation {
     mobileNormal: 375,
     mobileSmall: 320,
   );
+
   double get maxWidth => _maxLength(this, Axis.horizontal);
   double get maxWidthL => _maxLength(this, Axis.horizontal, RefinedSize.large);
-
   double get maxWidthM => _maxLength(this, Axis.horizontal, RefinedSize.normal);
-
   double get maxWidthS => _maxLength(this, Axis.horizontal, RefinedSize.small);
 
   double cardSize(BuildContext context) => getValueForScreenType(
         context,
         mobile: 90,
-        desktopTabletLandscape: 90,
+        tabletLandscapeDesktop: 90,
         tabletPortrait: 90,
       );
 
   double cardSizeSmall(BuildContext context) => getValueForScreenType(
         context,
         mobile: 70,
-        desktopTabletLandscape: 70,
+        tabletLandscapeDesktop: 70,
         tabletPortrait: 70,
       );
 
@@ -104,7 +114,7 @@ class SizingInformation {
     BuildContext context, {
     required T mobile,
     required T tabletPortrait,
-    required T desktopTabletLandscape,
+    required T tabletLandscapeDesktop,
   }) {
     if (deviceScreenType == DeviceScreenType.mobile) {
       return mobile;
@@ -114,7 +124,7 @@ class SizingInformation {
       return tabletPortrait;
     }
 
-    return desktopTabletLandscape;
+    return tabletLandscapeDesktop;
   }
 
   bool isMobileLandScape(BuildContext context) {
@@ -143,11 +153,11 @@ class SizingInformation {
     context, {
     required WidgetBuilder mobile,
     required WidgetBuilder tabletPortrait,
-    required WidgetBuilder desktopTabletLandscape,
+    required WidgetBuilder tabletLandscapeDesktop,
   }) {
     if (deviceScreenType == DeviceScreenType.desktop ||
         isTabletLandscape(context)) {
-      return desktopTabletLandscape(context);
+      return tabletLandscapeDesktop(context);
     }
 
     if (isTabletPortrait(context)) {
@@ -160,7 +170,7 @@ class SizingInformation {
   /// Max landscape column width tablet
   /// Can be used to in portrait but is less often used that way
   double _maxLength(
-    SizingInformation sizingInfo,
+    SizeInfo sizingInfo,
     Axis axis, [
     RefinedSize? size,
   ]) {
@@ -209,7 +219,7 @@ class SizingInformation {
   }
 
   double _theMaxLength(
-    SizingInformation sizingInfo,
+    SizeInfo sizingInfo,
     Axis axis, {
     required Map<RefinedSize, int> maxWidths,
     RefinedSize? size,
@@ -294,7 +304,7 @@ class RefinedBreakpoints {
   }
 }
 
-/// For when you don't have [SizingInformation]
+/// For when you don't have [SizeInfo]
 class SizeUtils {
   static bool isDesktop(BuildContext context) {
     final deviceType = _getDeviceType(context);
@@ -305,7 +315,7 @@ class SizeUtils {
   static bool isLandscape(BuildContext context) =>
       MediaQuery.of(context).orientation == Orientation.landscape;
 
-  /// For when you don't have [SizingInformation]
+  /// For when you don't have [SizeInfo]
   static bool isMobile(BuildContext context) {
     final deviceType = _getDeviceType(context);
 
@@ -315,43 +325,43 @@ class SizeUtils {
   /// Is mobile landscape
   static bool isMobileLandScape([
     BuildContext? context,
-    SizingInformation? sizingInformation,
+    SizeInfo? sizeInfo,
   ]) {
-    final deviceType = sizingInformation != null
-        ? sizingInformation.deviceScreenType
+    final deviceType = sizeInfo != null
+        ? sizeInfo.deviceScreenType
         : getDeviceType(MediaQuery.of(context!).size);
 
     return deviceType == DeviceScreenType.mobile && (isLandscape(context!));
   }
 
-  /// For when you don't have [SizingInformation]
+  /// For when you don't have [SizeInfo]
   static bool isNotDesktop(BuildContext context) => !isDesktop(context);
 
-  /// For when you don't have [SizingInformation]
+  /// For when you don't have [SizeInfo]
   static bool isNotMobile(context) => !isMobile(context);
 
   /// Is not mobile landscape
   static bool isNotMobileLandscape([
     BuildContext? context,
-    SizingInformation? sizingInformation,
+    SizeInfo? sizeInfo,
   ]) {
-    return !isMobileLandScape(context, sizingInformation);
+    return !isMobileLandScape(context, sizeInfo);
   }
 
-  /// For when you don't have [SizingInformation]
+  /// For when you don't have [SizeInfo]
   static bool isNotTablet(BuildContext? context) => !isTablet(context);
 
   static bool isPortrait(BuildContext context) =>
       MediaQuery.of(context).orientation == Orientation.portrait;
 
-  /// For when you don't have [SizingInformation]
+  /// For when you don't have [SizeInfo]
   static bool isTablet(context) {
     final deviceType = _getDeviceType(context);
 
     return deviceType == DeviceScreenType.tablet;
   }
 
-  /// For when you don't have [SizingInformation]
+  /// For when you don't have [SizeInfo]
   static DeviceScreenType _getDeviceType(BuildContext? context) {
     final deviceType = getDeviceType(MediaQuery.of(context!).size);
     return deviceType;

@@ -4,15 +4,15 @@ import '../responsive_builder.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
 typedef SizingInfoWidgetBuilder = Widget Function(
-    BuildContext, SizingInformation);
+    BuildContext, SizeInfo);
 
-/// A widget with a builder that provides you with the sizingInformation
+/// A widget with a builder that provides you with the sizeInfo
 ///
 /// This widget is used by the ScreenTypeLayout to provide different widget builders
 class ResponsiveBuilder extends StatelessWidget {
   final Widget Function(
     BuildContext context,
-    SizingInformation sizingInformation,
+    SizeInfo sizeInfo,
   ) builder;
 
   final ScreenBreakpoints? breakpoints;
@@ -29,7 +29,7 @@ class ResponsiveBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, boxConstraints) {
       var mediaQuery = MediaQuery.of(context);
-      var sizingInformation = SizingInformation(
+      var sizeInfo = SizeInfo(
         deviceScreenType: getDeviceType(mediaQuery.size, breakpoints),
         refinedSize: getRefinedSize(
           mediaQuery.size,
@@ -39,7 +39,7 @@ class ResponsiveBuilder extends StatelessWidget {
         localWidgetSize:
             Size(boxConstraints.maxWidth, boxConstraints.maxHeight),
       );
-      return builder(context, sizingInformation);
+      return builder(context, sizeInfo);
     });
   }
 }
@@ -89,12 +89,12 @@ class OrientationLayoutBuilder extends StatelessWidget {
 /// [watch] will be built and shown when width is less than 300
 /// [mobile] will be built when width greater than 300
 /// [tablet] will be built when width is greater than 600
-/// [desktopTabletLandscape] will be built if width is greater than 950
+/// [tabletLandscapeDesktop] will be built if width is greater than 950
 class ScreenTypeLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
   final SizingInfoWidgetBuilder mobile;
   final SizingInfoWidgetBuilder tabletPortrait;
-  final SizingInfoWidgetBuilder desktopTabletLandscape;
+  final SizingInfoWidgetBuilder tabletLandscapeDesktop;
 
   @Deprecated(
     'Use ScreenTypeLayout.builder instead for performance improvements',
@@ -104,36 +104,36 @@ class ScreenTypeLayout extends StatelessWidget {
     this.breakpoints,
     required Widget mobile,
     required Widget tabletPortrait,
-    required Widget desktopTabletLandscape,
+    required Widget tabletLandscapeDesktop,
   })  : 
         this.mobile = ((c, s) => mobile),
         this.tabletPortrait = ((c, s) => tabletPortrait),
-        this.desktopTabletLandscape = ((c, s) => desktopTabletLandscape);
+        this.tabletLandscapeDesktop = ((c, s) => tabletLandscapeDesktop);
 
   ScreenTypeLayout.builder({
     super.key,
     this.breakpoints,
     required this.mobile,
     required this.tabletPortrait,
-    required this.desktopTabletLandscape,
+    required this.tabletLandscapeDesktop,
   });
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       breakpoints: breakpoints,
-      builder: (context, sizingInformation) {
+      builder: (context, sizeInfo) {
         final orientation = MediaQuery.orientationOf(context);
 
-        if (sizingInformation.deviceScreenType == DeviceScreenType.desktop || sizingInformation.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
-          return desktopTabletLandscape(context, sizingInformation);
+        if (sizeInfo.deviceScreenType == DeviceScreenType.desktop || sizeInfo.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
+          return tabletLandscapeDesktop(context, sizeInfo);
         }
 
-        if (sizingInformation.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
-          return tabletPortrait(context, sizingInformation);
+        if (sizeInfo.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
+          return tabletPortrait(context, sizeInfo);
         }
 
-        return mobile(context, sizingInformation);
+        return mobile(context, sizeInfo);
       },
     );
   }
@@ -168,30 +168,30 @@ class RefinedLayoutBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       refinedBreakpoints: refinedBreakpoints,
-      builder: (context, sizingInformation) {
+      builder: (context, sizeInfo) {
         // If we're at extra large size
-        if (sizingInformation.refinedSize == RefinedSize.extraLarge) {
+        if (sizeInfo.refinedSize == RefinedSize.extraLarge) {
           // If we have supplied the extra large layout then display that
           if (extraLarge != null)
-            return extraLarge!(context, sizingInformation);
+            return extraLarge!(context, sizeInfo);
           // If no extra large layout is supplied we want to check if we have the size below it and display that
-          if (large != null) return large!(context, sizingInformation);
+          if (large != null) return large!(context, sizeInfo);
         }
 
-        if (sizingInformation.refinedSize == RefinedSize.large) {
+        if (sizeInfo.refinedSize == RefinedSize.large) {
           // If we have supplied the large layout then display that
-          if (large != null) return large!(context, sizingInformation);
+          if (large != null) return large!(context, sizeInfo);
           // If no large layout is supplied we want to check if we have the size below it and display that
-          return normal(context, sizingInformation);
+          return normal(context, sizeInfo);
         }
 
-        if (sizingInformation.refinedSize == RefinedSize.small) {
+        if (sizeInfo.refinedSize == RefinedSize.small) {
           // If we have supplied the small layout then display that
-          if (small != null) return small!(context, sizingInformation);
+          if (small != null) return small!(context, sizeInfo);
         }
 
         // If none of the layouts above are supplied or we're on the small size layout then we show the small layout
-        return normal(context, sizingInformation);
+        return normal(context, sizeInfo);
       },
     );
   }
