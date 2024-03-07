@@ -151,20 +151,36 @@ class SizeInfo {
 
   Widget screenTypeLayoutBuilder(
     context, {
-    required WidgetBuilder mobile,
-    required WidgetBuilder tabletPortrait,
-    required WidgetBuilder tabletLandscapeDesktop,
+    SizeInfoWidgetBuilder? mobile,
+    SizeInfoWidgetBuilder? tabletPortrait,
+    SizeInfoWidgetBuilder? tabletLandscapeDesktop,
   }) {
+    final orientation = MediaQuery.orientationOf(context);
+
     if (deviceScreenType == DeviceScreenType.desktop ||
-        isTabletLandscape(context)) {
-      return tabletLandscapeDesktop(context);
+        deviceScreenType == DeviceScreenType.tablet &&
+            orientation == Orientation.landscape) {
+      if (tabletLandscapeDesktop != null)
+        return tabletLandscapeDesktop(context, this);
+
+      if (tabletPortrait != null) return tabletPortrait(context, this);
     }
 
-    if (isTabletPortrait(context)) {
-      return tabletPortrait(context);
+    if (deviceScreenType == DeviceScreenType.tablet &&
+        orientation == Orientation.portrait) {
+      if (tabletPortrait != null) return tabletPortrait(context, this);
     }
 
-    return mobile(context);
+    if (deviceScreenType == DeviceScreenType.mobile) {
+      if (mobile != null) return mobile(context, this);
+    }
+
+    final buildDesktopLayout =
+        ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
+
+    return buildDesktopLayout
+        ? tabletLandscapeDesktop(context, this)
+        : mobile!(context, this);
   }
 
   /// Max landscape column width tablet

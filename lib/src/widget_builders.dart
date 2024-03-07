@@ -105,34 +105,12 @@ class ScreenTypeLayout extends StatelessWidget {
     return ResponsiveBuilder(
       breakpoints: breakpoints,
       builder: (context, sizeInfo) {
-        final orientation = MediaQuery.orientationOf(context);
-
-        if (sizeInfo.deviceScreenType == DeviceScreenType.desktop ||
-            sizeInfo.deviceScreenType == DeviceScreenType.tablet &&
-                orientation == Orientation.landscape) {
-
-          if (tabletLandscapeDesktop != null) return tabletLandscapeDesktop!(context, sizeInfo);
-          
-          if (tabletPortrait != null) return tabletPortrait!(context, sizeInfo);
-          
-        }
-
-        if (sizeInfo.deviceScreenType == DeviceScreenType.tablet &&
-            orientation == Orientation.portrait) {
-          if (tabletPortrait != null) return tabletPortrait!(context, sizeInfo);
-          
-        }
-
-        if (sizeInfo.deviceScreenType == DeviceScreenType.mobile) {
-          if (mobile != null) return mobile!(context, sizeInfo);
-        }
-
-        final buildDesktopLayout =
-            ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
-
-        return buildDesktopLayout
-            ? tabletLandscapeDesktop!(context, sizeInfo)
-            : mobile!(context, sizeInfo);
+        return sizeInfo.screenTypeLayoutBuilder(
+          context,
+          mobile: mobile,
+          tabletPortrait: tabletPortrait,
+          tabletLandscapeDesktop: tabletLandscapeDesktop,
+        );
       },
     );
   }
