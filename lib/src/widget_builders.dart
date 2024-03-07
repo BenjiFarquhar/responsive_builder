@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../responsive_builder.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
-typedef SizingInfoWidgetBuilder = Widget Function(
-    BuildContext, SizeInfo);
+typedef SizeInfoWidgetBuilder = Widget Function(BuildContext, SizeInfo);
+typedef Widget SizeInfoBuilder(SizeInfo sizeInfo);
 
 /// A widget with a builder that provides you with the sizeInfo
 ///
@@ -86,36 +86,18 @@ class OrientationLayoutBuilder extends StatelessWidget {
 ///
 /// Each builder will get built based on the current device width.
 /// [breakpoints] define your own custom device resolutions
-/// [watch] will be built and shown when width is less than 300
-/// [mobile] will be built when width greater than 300
-/// [tablet] will be built when width is greater than 600
-/// [tabletLandscapeDesktop] will be built if width is greater than 950
 class ScreenTypeLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
-  final SizingInfoWidgetBuilder mobile;
-  final SizingInfoWidgetBuilder tabletPortrait;
-  final SizingInfoWidgetBuilder tabletLandscapeDesktop;
-
-  @Deprecated(
-    'Use ScreenTypeLayout.builder instead for performance improvements',
-  )
-  ScreenTypeLayout({
-    super.key,
-    this.breakpoints,
-    required Widget mobile,
-    required Widget tabletPortrait,
-    required Widget tabletLandscapeDesktop,
-  })  : 
-        this.mobile = ((c, s) => mobile),
-        this.tabletPortrait = ((c, s) => tabletPortrait),
-        this.tabletLandscapeDesktop = ((c, s) => tabletLandscapeDesktop);
+  final SizeInfoWidgetBuilder? mobile;
+  final SizeInfoWidgetBuilder? tabletPortrait;
+  final SizeInfoWidgetBuilder? tabletLandscapeDesktop;
 
   ScreenTypeLayout.builder({
     super.key,
     this.breakpoints,
-    required this.mobile,
-    required this.tabletPortrait,
-    required this.tabletLandscapeDesktop,
+    this.mobile,
+    this.tabletPortrait,
+    this.tabletLandscapeDesktop,
   });
 
   @override
@@ -125,15 +107,32 @@ class ScreenTypeLayout extends StatelessWidget {
       builder: (context, sizeInfo) {
         final orientation = MediaQuery.orientationOf(context);
 
-        if (sizeInfo.deviceScreenType == DeviceScreenType.desktop || sizeInfo.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
-          return tabletLandscapeDesktop(context, sizeInfo);
+        if (sizeInfo.deviceScreenType == DeviceScreenType.desktop ||
+            sizeInfo.deviceScreenType == DeviceScreenType.tablet &&
+                orientation == Orientation.landscape) {
+
+          if (tabletLandscapeDesktop != null) return tabletLandscapeDesktop!(context, sizeInfo);
+          
+          if (tabletPortrait != null) return tabletPortrait!(context, sizeInfo);
+          
         }
 
-        if (sizeInfo.deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
-          return tabletPortrait(context, sizeInfo);
+        if (sizeInfo.deviceScreenType == DeviceScreenType.tablet &&
+            orientation == Orientation.portrait) {
+          if (tabletPortrait != null) return tabletPortrait!(context, sizeInfo);
+          
         }
 
-        return mobile(context, sizeInfo);
+        if (sizeInfo.deviceScreenType == DeviceScreenType.mobile) {
+          if (mobile != null) return mobile!(context, sizeInfo);
+        }
+
+        final buildDesktopLayout =
+            ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
+
+        return buildDesktopLayout
+            ? tabletLandscapeDesktop!(context, sizeInfo)
+            : mobile!(context, sizeInfo);
       },
     );
   }
@@ -150,10 +149,10 @@ class ScreenTypeLayout extends StatelessWidget {
 class RefinedLayoutBuilder extends StatelessWidget {
   final RefinedBreakpoints? refinedBreakpoints;
 
-  final SizingInfoWidgetBuilder? extraLarge;
-  final SizingInfoWidgetBuilder? large;
-  final SizingInfoWidgetBuilder normal;
-  final SizingInfoWidgetBuilder? small;
+  final SizeInfoWidgetBuilder? extraLarge;
+  final SizeInfoWidgetBuilder? large;
+  final SizeInfoWidgetBuilder normal;
+  final SizeInfoWidgetBuilder? small;
 
   const RefinedLayoutBuilder({
     Key? key,
@@ -172,8 +171,7 @@ class RefinedLayoutBuilder extends StatelessWidget {
         // If we're at extra large size
         if (sizeInfo.refinedSize == RefinedSize.extraLarge) {
           // If we have supplied the extra large layout then display that
-          if (extraLarge != null)
-            return extraLarge!(context, sizeInfo);
+          if (extraLarge != null) return extraLarge!(context, sizeInfo);
           // If no extra large layout is supplied we want to check if we have the size below it and display that
           if (large != null) return large!(context, sizeInfo);
         }
