@@ -1,3 +1,11 @@
+## 1.0.0
+March 8, 2024
+
+- Rename `SizingInformation` to `SizeInfo`.
+- Add `tabletPortrait` and `tabletLandscapeDesktop` optional parameters to `ScreenTypeLayout.builder`.
+- Add `maxWidth`, `maxWidthS`, `maxWidthM`, `maxWidthL` to `SizeInfo`.
+- Add `SizeUtils` utility class.
+
 ## 0.7.0
 
 - Fixes #50
