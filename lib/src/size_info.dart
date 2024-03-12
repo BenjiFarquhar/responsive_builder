@@ -71,6 +71,20 @@ class SizeInfo {
     RefinedSize.extraLarge: 580,
   };
 
+  static const _maxSideBarWidthTablet = {
+    RefinedSize.small: 320,
+    RefinedSize.normal: 330,
+    RefinedSize.large: 340,
+    RefinedSize.extraLarge: 350,
+  };
+
+  static const _maxSideBarWidthDesktop = {
+    RefinedSize.small: 410,
+    RefinedSize.normal: 420,
+    RefinedSize.large: 430,
+    RefinedSize.extraLarge: 440,
+  };
+
   static const RefinedBreakpoints customRefinedBreakpoints = RefinedBreakpoints(
     // Desktop
     desktopExtraLarge: 1800,
@@ -89,10 +103,65 @@ class SizeInfo {
     mobileSmall: 320,
   );
 
-  double get maxWidth => _maxLength(this, Axis.horizontal);
-  double get maxWidthL => _maxLength(this, Axis.horizontal, RefinedSize.large);
-  double get maxWidthM => _maxLength(this, Axis.horizontal, RefinedSize.normal);
-  double get maxWidthS => _maxLength(this, Axis.horizontal, RefinedSize.small);
+  double get maxColumnWidth => _maxLength(
+        this,
+        Axis.horizontal,
+        maxWidthMobile: _maxColumnWidthMobile,
+        maxWidthTablet: _maxColumnWidthTablet,
+        maxWidthDesktop: _maxColumnWidthDesktop,
+      );
+  double get maxColumnWidthL => _maxLength(
+        this,
+        Axis.horizontal,
+        size: RefinedSize.large,
+        maxWidthMobile: _maxColumnWidthMobile,
+        maxWidthTablet: _maxColumnWidthTablet,
+        maxWidthDesktop: _maxColumnWidthDesktop,
+      );
+  double get maxColumnWidthM => _maxLength(
+        this,
+        Axis.horizontal,
+        size: RefinedSize.normal,
+        maxWidthMobile: _maxColumnWidthMobile,
+        maxWidthTablet: _maxColumnWidthTablet,
+        maxWidthDesktop: _maxColumnWidthDesktop,
+      );
+  double get maxColumnWidthS => _maxLength(
+        this,
+        Axis.horizontal,
+        size: RefinedSize.small,
+        maxWidthMobile: _maxColumnWidthMobile,
+        maxWidthTablet: _maxColumnWidthTablet,
+        maxWidthDesktop: _maxColumnWidthDesktop,
+      );
+
+  double get maxSideBarWidth => _maxLength(
+        this,
+        Axis.horizontal,
+        maxWidthTablet: _maxSideBarWidthTablet,
+        maxWidthDesktop: _maxSideBarWidthDesktop,
+      );
+  double get maxSideBarWidthL => _maxLength(
+        this,
+        Axis.horizontal,
+        size: RefinedSize.large,
+        maxWidthTablet: _maxSideBarWidthTablet,
+        maxWidthDesktop: _maxSideBarWidthDesktop,
+      );
+  double get maxSideBarWidthM => _maxLength(
+        this,
+        Axis.horizontal,
+        size: RefinedSize.normal,
+        maxWidthTablet: _maxSideBarWidthTablet,
+        maxWidthDesktop: _maxSideBarWidthDesktop,
+      );
+  double get maxSideBarWidthS => _maxLength(
+        this,
+        Axis.horizontal,
+        size: RefinedSize.small,
+        maxWidthTablet: _maxSideBarWidthTablet,
+        maxWidthDesktop: _maxSideBarWidthDesktop,
+      );
 
   double cardSize(BuildContext context) => getValueForScreenType(
         context,
@@ -128,22 +197,18 @@ class SizeInfo {
   }
 
   bool isMobileLandScape(BuildContext context) {
-    return deviceScreenType == DeviceScreenType.mobile &&
-        (SizeUtils.isLandscape(context));
+    return deviceScreenType == DeviceScreenType.mobile && (SizeUtils.isLandscape(context));
   }
 
   /// Used for screens that have a [VpTopNavBar]
-  bool isNarrowScreen(BuildContext context) =>
-      (isMobile || (isTabletPortrait(context)));
+  bool isNarrowScreen(BuildContext context) => (isMobile || (isTabletPortrait(context)));
 
   bool isTabletLandscape(BuildContext context) {
-    return deviceScreenType == DeviceScreenType.tablet &&
-        (SizeUtils.isLandscape(context));
+    return deviceScreenType == DeviceScreenType.tablet && (SizeUtils.isLandscape(context));
   }
 
   bool isTabletPortrait(BuildContext context) {
-    return deviceScreenType == DeviceScreenType.tablet &&
-        (SizeUtils.isPortrait(context));
+    return deviceScreenType == DeviceScreenType.tablet && (SizeUtils.isPortrait(context));
   }
 
   /// Used for screens that have a [VpBottomNavBar]
@@ -157,17 +222,13 @@ class SizeInfo {
   }) {
     final orientation = MediaQuery.orientationOf(context);
 
-    if (deviceScreenType == DeviceScreenType.desktop ||
-        deviceScreenType == DeviceScreenType.tablet &&
-            orientation == Orientation.landscape) {
-      if (tabletLandscapeDesktop != null)
-        return tabletLandscapeDesktop(context, this);
+    if (deviceScreenType == DeviceScreenType.desktop || deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
+      if (tabletLandscapeDesktop != null) return tabletLandscapeDesktop(context, this);
 
       if (tabletPortrait != null) return tabletPortrait(context, this);
     }
 
-    if (deviceScreenType == DeviceScreenType.tablet &&
-        orientation == Orientation.portrait) {
+    if (deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
       if (tabletPortrait != null) return tabletPortrait(context, this);
     }
 
@@ -175,60 +236,63 @@ class SizeInfo {
       if (mobile != null) return mobile(context, this);
     }
 
-    final buildDesktopLayout =
-        ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
+    final buildDesktopLayout = ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
 
-    return buildDesktopLayout
-        ? tabletLandscapeDesktop(context, this)
-        : mobile!(context, this);
+    return buildDesktopLayout ? tabletLandscapeDesktop(context, this) : mobile!(context, this);
   }
 
   /// Max landscape column width tablet
   /// Can be used to in portrait but is less often used that way
   double _maxLength(
     SizeInfo sizingInfo,
-    Axis axis, [
+    Axis axis, {
+    Map<RefinedSize, int>? maxWidthMobile,
+    Map<RefinedSize, int>? maxWidthTablet,
+    Map<RefinedSize, int>? maxWidthDesktop,
     RefinedSize? size,
-  ]) {
+  }) {
     double maxLength = 0;
 
-    const maxWidthDesktop = _maxColumnWidthDesktop;
-    const maxWidthTablet = _maxColumnWidthTablet;
-    const maxWidthMobile = _maxColumnWidthMobile;
-
-    // ignore: missing_enum_constant_in_switch
     switch (sizingInfo.deviceScreenType) {
-      case DeviceScreenType.desktop:
-        maxLength = _theMaxLength(
-          sizingInfo,
-          axis,
-          size: size,
-          maxWidths: maxWidthDesktop,
-        );
+      case DeviceScreenType.mobile:
+        maxLength = maxWidthMobile != null
+            ? _theMaxLength(
+                sizingInfo,
+                axis,
+                size: size,
+                maxWidths: maxWidthMobile,
+              )
+            : 0;
         break;
       case DeviceScreenType.tablet:
-        maxLength = _theMaxLength(
-          sizingInfo,
-          axis,
-          size: size,
-          maxWidths: maxWidthTablet,
-        );
+        maxLength = maxWidthTablet != null
+            ? _theMaxLength(
+                sizingInfo,
+                axis,
+                size: size,
+                maxWidths: maxWidthTablet,
+              )
+            : 0;
         break;
-      case DeviceScreenType.mobile:
-        maxLength = _theMaxLength(
-          sizingInfo,
-          axis,
-          size: size,
-          maxWidths: maxWidthMobile,
-        );
+      case DeviceScreenType.desktop:
+        maxLength = maxWidthDesktop != null
+            ? _theMaxLength(
+                sizingInfo,
+                axis,
+                size: size,
+                maxWidths: maxWidthDesktop,
+              )
+            : 0;
         break;
       default:
-        maxLength = _theMaxLength(
-          sizingInfo,
-          axis,
-          size: size,
-          maxWidths: maxWidthMobile,
-        );
+        maxLength = maxWidthMobile != null
+            ? _theMaxLength(
+                sizingInfo,
+                axis,
+                size: size,
+                maxWidths: maxWidthMobile,
+              )
+            : 0;
     }
 
     return maxLength;
@@ -245,15 +309,11 @@ class SizeInfo {
       // width
       maxLength = maxWidths[size ?? sizingInfo.refinedSize]!.toDouble();
 
-      return sizingInfo.localWidgetSize.width < maxLength
-          ? sizingInfo.localWidgetSize.width
-          : maxLength.toDouble();
+      return sizingInfo.localWidgetSize.width < maxLength ? sizingInfo.localWidgetSize.width : maxLength.toDouble();
     } else {
       // height
       //do not use this
-      return sizingInfo.localWidgetSize.height < maxLength
-          ? sizingInfo.localWidgetSize.height
-          : maxLength.toDouble();
+      return sizingInfo.localWidgetSize.height < maxLength ? sizingInfo.localWidgetSize.height : maxLength.toDouble();
     }
   }
 }
@@ -328,8 +388,7 @@ class SizeUtils {
     return deviceType == DeviceScreenType.desktop;
   }
 
-  static bool isLandscape(BuildContext context) =>
-      MediaQuery.of(context).orientation == Orientation.landscape;
+  static bool isLandscape(BuildContext context) => MediaQuery.of(context).orientation == Orientation.landscape;
 
   /// For when you don't have [SizeInfo]
   static bool isMobile(BuildContext context) {
@@ -343,9 +402,7 @@ class SizeUtils {
     BuildContext? context,
     SizeInfo? sizeInfo,
   ]) {
-    final deviceType = sizeInfo != null
-        ? sizeInfo.deviceScreenType
-        : getDeviceType(MediaQuery.of(context!).size);
+    final deviceType = sizeInfo != null ? sizeInfo.deviceScreenType : getDeviceType(MediaQuery.of(context!).size);
 
     return deviceType == DeviceScreenType.mobile && (isLandscape(context!));
   }
@@ -367,8 +424,7 @@ class SizeUtils {
   /// For when you don't have [SizeInfo]
   static bool isNotTablet(BuildContext? context) => !isTablet(context);
 
-  static bool isPortrait(BuildContext context) =>
-      MediaQuery.of(context).orientation == Orientation.portrait;
+  static bool isPortrait(BuildContext context) => MediaQuery.of(context).orientation == Orientation.portrait;
 
   /// For when you don't have [SizeInfo]
   static bool isTablet(context) {
