@@ -72,10 +72,10 @@ class SizeInfo {
   };
 
   static const _maxSideBarWidthTablet = {
-    RefinedSize.small: 320,
-    RefinedSize.normal: 330,
-    RefinedSize.large: 340,
-    RefinedSize.extraLarge: 350,
+    RefinedSize.small: 370,
+    RefinedSize.normal: 380,
+    RefinedSize.large: 390,
+    RefinedSize.extraLarge: 400,
   };
 
   static const _maxSideBarWidthDesktop = {
@@ -241,6 +241,13 @@ class SizeInfo {
     return buildDesktopLayout ? tabletLandscapeDesktop(context, this) : mobile!(context, this);
   }
 
+  Widget maybeSidebarBuilder(BuildContext context, {
+    required SizeInfoWidgetBuilder trueBuilder,
+    SizeInfoWidgetBuilder? falseBuilder,
+  }) {
+    return screenTypeLayoutBuilder(context, mobile: falseBuilder, tabletLandscapeDesktop: trueBuilder);
+  }
+
   /// Max landscape column width tablet
   /// Can be used to in portrait but is less often used that way
   double _maxLength(
@@ -309,7 +316,7 @@ class SizeInfo {
       // width
       maxLength = maxWidths[size ?? sizingInfo.refinedSize]!.toDouble();
 
-      return sizingInfo.localWidgetSize.width < maxLength ? sizingInfo.localWidgetSize.width : maxLength.toDouble();
+      return (sizingInfo.localWidgetSize.width != 0 && sizingInfo.localWidgetSize.width < maxLength) ? sizingInfo.localWidgetSize.width : maxLength.toDouble();
     } else {
       // height
       //do not use this
@@ -336,6 +343,12 @@ class ScreenBreakpoints {
   String toString() {
     return "Desktop: $desktop, Tablet: $tablet, Watch: $watch";
   }
+
+  static const ScreenBreakpoints customBreakpoints = ScreenBreakpoints(
+    desktop: 950,
+    tablet: 600,
+    watch: 300,
+  );
 }
 
 /// Manually define refined breakpoints

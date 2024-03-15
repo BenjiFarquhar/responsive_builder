@@ -11,9 +11,16 @@ class ResponsiveSizingConfig {
     return _instance!;
   }
 
-  static const ScreenBreakpoints _defaultBreakPoints = const ScreenBreakpoints(
+  static const ScreenBreakpoints defaultBreakPoints = const ScreenBreakpoints(
     desktop: 950,
     tablet: 600,
+    watch: 300,
+  );
+
+  static const ScreenBreakpoints sidebarLayoutBreakpoints =
+      const ScreenBreakpoints(
+    desktop: 950,
+    tablet: 700,
     watch: 300,
   );
 
@@ -52,7 +59,7 @@ class ResponsiveSizingConfig {
   }
 
   ScreenBreakpoints get breakpoints =>
-      _customBreakPoints ?? _defaultBreakPoints;
+      _customBreakPoints ?? defaultBreakPoints;
 
   RefinedBreakpoints get refinedBreakpoints =>
       _customRefinedBreakPoints ?? _defaultRefinedBreakPoints;

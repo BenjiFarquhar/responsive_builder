@@ -36,8 +36,7 @@ class ResponsiveBuilder extends StatelessWidget {
           refinedBreakpoint: refinedBreakpoints,
         ),
         screenSize: mediaQuery.size,
-        localWidgetSize:
-            Size(boxConstraints.maxWidth, boxConstraints.maxHeight),
+        localWidgetSize: Size(boxConstraints.maxWidth, boxConstraints.maxHeight),
       );
       return builder(context, sizeInfo);
     });
@@ -68,9 +67,7 @@ class OrientationLayoutBuilder extends StatelessWidget {
     return Builder(
       builder: (context) {
         var orientation = MediaQuery.of(context).orientation;
-        if (mode != OrientationLayoutBuilderMode.portrait &&
-            (orientation == Orientation.landscape ||
-                mode == OrientationLayoutBuilderMode.landscape)) {
+        if (mode != OrientationLayoutBuilderMode.portrait && (orientation == Orientation.landscape || mode == OrientationLayoutBuilderMode.landscape)) {
           if (landscape != null) {
             return landscape!(context);
           }
@@ -86,19 +83,28 @@ class OrientationLayoutBuilder extends StatelessWidget {
 ///
 /// Each builder will get built based on the current device width.
 /// [breakpoints] define your own custom device resolutions
-class ScreenTypeLayout extends StatelessWidget {
+class ResponsiveLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
-  final SizeInfoWidgetBuilder? mobile;
-  final SizeInfoWidgetBuilder? tabletPortrait;
-  final SizeInfoWidgetBuilder? tabletLandscapeDesktop;
+  final SizeInfoWidgetBuilder? mobileBuilder;
+  final SizeInfoWidgetBuilder? tabletPortraitBuilder;
+  final SizeInfoWidgetBuilder? tabletLandscapeDesktopBuilder;
 
-  ScreenTypeLayout.builder({
+  ResponsiveLayout.screenType({
     super.key,
     this.breakpoints,
-    this.mobile,
-    this.tabletPortrait,
-    this.tabletLandscapeDesktop,
+    this.mobileBuilder,
+    this.tabletPortraitBuilder,
+    this.tabletLandscapeDesktopBuilder,
   });
+
+  ResponsiveLayout.maybeSidebar({
+    super.key,
+    required SizeInfoWidgetBuilder trueBuilder,
+    SizeInfoWidgetBuilder? falseBuilder,
+  })  : breakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints,
+        mobileBuilder = falseBuilder,
+        tabletLandscapeDesktopBuilder = trueBuilder,
+        tabletPortraitBuilder = null;
 
   @override
   Widget build(BuildContext context) {
@@ -107,16 +113,16 @@ class ScreenTypeLayout extends StatelessWidget {
       builder: (context, sizeInfo) {
         return sizeInfo.screenTypeLayoutBuilder(
           context,
-          mobile: mobile,
-          tabletPortrait: tabletPortrait,
-          tabletLandscapeDesktop: tabletLandscapeDesktop,
+          mobile: mobileBuilder,
+          tabletPortrait: tabletPortraitBuilder,
+          tabletLandscapeDesktop: tabletLandscapeDesktopBuilder,
         );
       },
     );
   }
 }
 
-/// Provides a builder function for refined screen sizes to be used with [ScreenTypeLayout]
+/// Provides a builder function for refined screen sizes to be used with [ResponsiveLayout]
 ///
 /// Each builder will get built based on the current device width.
 /// [breakpoints] define your own custom device resolutions
