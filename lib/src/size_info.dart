@@ -34,11 +34,11 @@ class SizeInfo {
     required this.localWidgetSize,
   });
 
-  factory SizeInfo.fromContext(BuildContext context) {
+  factory SizeInfo.fromContext(BuildContext context, {screenBreakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints}) {
     final size = MediaQuery.sizeOf(context);
 
     return SizeInfo(
-      deviceScreenType: getDeviceType(size),
+      deviceScreenType: getDeviceType(size, screenBreakpoints),
       refinedSize: getRefinedSize(size),
       screenSize: size,
       localWidgetSize: const Size(0, 0),
@@ -241,7 +241,8 @@ class SizeInfo {
     return buildDesktopLayout ? tabletLandscapeDesktop(context, this) : mobile!(context, this);
   }
 
-  Widget maybeSidebarBuilder(BuildContext context, {
+  Widget maybeSidebarBuilder(
+    BuildContext context, {
     required SizeInfoWidgetBuilder trueBuilder,
     SizeInfoWidgetBuilder? falseBuilder,
   }) {
