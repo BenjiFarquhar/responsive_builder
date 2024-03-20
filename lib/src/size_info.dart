@@ -34,7 +34,7 @@ class SizeInfo {
     required this.localWidgetSize,
   });
 
-  factory SizeInfo.fromContext(BuildContext context, {screenBreakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints}) {
+  factory SizeInfo.of(BuildContext context, {screenBreakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints}) {
     final size = MediaQuery.sizeOf(context);
 
     return SizeInfo(
