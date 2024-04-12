@@ -214,6 +214,14 @@ class SizeInfo {
   /// Used for screens that have a [VpBottomNavBar]
   bool isWideScreen(BuildContext context) => !isNarrowScreen(context);
 
+  bool get isNotSidebarSize {
+    return localWidgetSize.width <= ResponsiveSizingConfig.sidebarLayoutBreakpoints.tablet;
+  }
+
+  bool get isSidebarSize {
+    return !isNotSidebarSize;
+  }
+
   Widget screenTypeLayoutBuilder(
     context, {
     SizeInfoWidgetBuilder? mobile,
@@ -239,14 +247,6 @@ class SizeInfo {
     final buildDesktopLayout = ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
 
     return buildDesktopLayout ? tabletLandscapeDesktop(context, this) : mobile!(context, this);
-  }
-
-  Widget maybeSidebarBuilder(
-    BuildContext context, {
-    required SizeInfoWidgetBuilder trueBuilder,
-    SizeInfoWidgetBuilder? falseBuilder,
-  }) {
-    return screenTypeLayoutBuilder(context, mobile: falseBuilder, tabletLandscapeDesktop: trueBuilder);
   }
 
   /// Max landscape column width tablet

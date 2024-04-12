@@ -4,6 +4,7 @@ import '../responsive_builder.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
 typedef SizeInfoWidgetBuilder = Widget Function(BuildContext, SizeInfo);
+typedef LocalSizeWidgetBuilder = Widget Function(BuildContext, Size);
 typedef Widget SizeInfoBuilder(SizeInfo sizeInfo);
 
 /// A widget with a builder that provides you with the sizeInfo
@@ -174,6 +175,32 @@ class RefinedLayoutBuilder extends StatelessWidget {
 
         // If none of the layouts above are supplied or we're on the small size layout then we show the small layout
         return normal(context, sizeInfo);
+      },
+    );
+  }
+}
+
+class LocalWidgetSizeBuilder extends StatelessWidget {
+  final LocalSizeWidgetBuilder narrowBuilder;
+  final LocalSizeWidgetBuilder wideBuilder;
+  final double breakPoint;
+
+  const LocalWidgetSizeBuilder({
+    super.key,
+    required this.narrowBuilder,
+    required this.wideBuilder,
+    required this.breakPoint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < breakPoint) {
+          return narrowBuilder(context, Size(constraints.maxWidth, constraints.maxHeight));
+        } else {
+          return wideBuilder(context, Size(constraints.maxWidth, constraints.maxHeight));
+        }
       },
     );
   }
