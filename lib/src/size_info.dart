@@ -222,6 +222,18 @@ class SizeInfo {
     return !isNotSidebarSize;
   }
 
+  Widget? screenWidthBuilder(
+    BuildContext context, {
+    required OptionalWidgetBuilder narrow,
+    required OptionalWidgetBuilder wide,
+  }) {
+    if (isNarrowScreen(context)) {
+      return narrow(context);
+    } else {
+      return wide(context);
+    }
+  }
+
   Widget screenTypeLayoutBuilder(
     context, {
     SizeInfoWidgetBuilder? mobile,

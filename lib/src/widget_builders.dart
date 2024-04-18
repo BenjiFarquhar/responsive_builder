@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../responsive_builder.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
+typedef OptionalWidgetBuilder = Widget? Function(BuildContext);
 typedef SizeInfoWidgetBuilder = Widget Function(BuildContext, SizeInfo);
 typedef LocalSizeWidgetBuilder = Widget Function(BuildContext, Size);
 typedef Widget SizeInfoBuilder(SizeInfo sizeInfo);
@@ -86,16 +87,16 @@ class OrientationLayoutBuilder extends StatelessWidget {
 /// [breakpoints] define your own custom device resolutions
 class ResponsiveLayout extends StatelessWidget {
   final ScreenBreakpoints? breakpoints;
-  final SizeInfoWidgetBuilder? mobileBuilder;
-  final SizeInfoWidgetBuilder? tabletPortraitBuilder;
-  final SizeInfoWidgetBuilder? tabletLandscapeDesktopBuilder;
+  final SizeInfoWidgetBuilder? mobile;
+  final SizeInfoWidgetBuilder? tabletPortrait;
+  final SizeInfoWidgetBuilder? tabletLandscapeDesktop;
 
   ResponsiveLayout.screenType({
     super.key,
     this.breakpoints,
-    this.mobileBuilder,
-    this.tabletPortraitBuilder,
-    this.tabletLandscapeDesktopBuilder,
+    this.mobile,
+    this.tabletPortrait,
+    this.tabletLandscapeDesktop,
   });
 
   ResponsiveLayout.maybeSidebar({
@@ -103,9 +104,9 @@ class ResponsiveLayout extends StatelessWidget {
     required SizeInfoWidgetBuilder trueBuilder,
     SizeInfoWidgetBuilder? falseBuilder,
   })  : breakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints,
-        mobileBuilder = falseBuilder,
-        tabletLandscapeDesktopBuilder = trueBuilder,
-        tabletPortraitBuilder = null;
+        mobile = falseBuilder,
+        tabletLandscapeDesktop = trueBuilder,
+        tabletPortrait = null;
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +115,9 @@ class ResponsiveLayout extends StatelessWidget {
       builder: (context, sizeInfo) {
         return sizeInfo.screenTypeLayoutBuilder(
           context,
-          mobile: mobileBuilder,
-          tabletPortrait: tabletPortraitBuilder,
-          tabletLandscapeDesktop: tabletLandscapeDesktopBuilder,
+          mobile: mobile,
+          tabletPortrait: tabletPortrait,
+          tabletLandscapeDesktop: tabletLandscapeDesktop,
         );
       },
     );
@@ -181,14 +182,14 @@ class RefinedLayoutBuilder extends StatelessWidget {
 }
 
 class LocalWidgetSizeBuilder extends StatelessWidget {
-  final LocalSizeWidgetBuilder narrowBuilder;
-  final LocalSizeWidgetBuilder wideBuilder;
+  final LocalSizeWidgetBuilder narrow;
+  final LocalSizeWidgetBuilder wide;
   final double breakPoint;
 
   const LocalWidgetSizeBuilder({
     super.key,
-    required this.narrowBuilder,
-    required this.wideBuilder,
+    required this.narrow,
+    required this.wide,
     required this.breakPoint,
   });
 
@@ -197,10 +198,39 @@ class LocalWidgetSizeBuilder extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < breakPoint) {
-          return narrowBuilder(context, Size(constraints.maxWidth, constraints.maxHeight));
+          return narrow(context, Size(constraints.maxWidth, constraints.maxHeight));
         } else {
-          return wideBuilder(context, Size(constraints.maxWidth, constraints.maxHeight));
+          return wide(context, Size(constraints.maxWidth, constraints.maxHeight));
         }
+      },
+    );
+  }
+}
+
+class LocalWidgetSizesBuilder extends StatelessWidget {
+  final List<LocalSizeWidgetBuilder> builders;
+  final List<double> breakPoints;
+
+  const LocalWidgetSizesBuilder({
+    super.key,
+    required this.builders,
+    required this.breakPoints,
+  }) : assert(
+          builders.length == breakPoints.length + 1,
+          'There should be exactly one more builder than breakpoints.',
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        for (int i = 0; i < breakPoints.length; i++) {
+          if (constraints.maxWidth < breakPoints[i]) {
+            return builders[i](context, Size(constraints.maxWidth, constraints.maxHeight));
+          }
+        }
+
+        return builders.last(context, Size(constraints.maxWidth, constraints.maxHeight));
       },
     );
   }
