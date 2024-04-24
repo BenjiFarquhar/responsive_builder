@@ -215,7 +215,7 @@ class SizeInfo {
   bool isWideScreen(BuildContext context) => !isNarrowScreen(context);
 
   bool get isNotSidebarSize {
-    return localWidgetSize.width <= ResponsiveSizingConfig.sidebarLayoutBreakpoints.tablet;
+    return screenSize.width <= ResponsiveSizingConfig.sidebarLayoutBreakpoints.tablet;
   }
 
   bool get isSidebarSize {
