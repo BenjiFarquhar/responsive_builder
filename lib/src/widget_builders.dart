@@ -38,7 +38,8 @@ class ResponsiveBuilder extends StatelessWidget {
           refinedBreakpoint: refinedBreakpoints,
         ),
         screenSize: mediaQuery.size,
-        localWidgetSize: Size(boxConstraints.maxWidth, boxConstraints.maxHeight),
+        localWidgetSize:
+            Size(boxConstraints.maxWidth, boxConstraints.maxHeight),
       );
       return builder(context, sizeInfo);
     });
@@ -69,7 +70,9 @@ class OrientationLayoutBuilder extends StatelessWidget {
     return Builder(
       builder: (context) {
         var orientation = MediaQuery.of(context).orientation;
-        if (mode != OrientationLayoutBuilderMode.portrait && (orientation == Orientation.landscape || mode == OrientationLayoutBuilderMode.landscape)) {
+        if (mode != OrientationLayoutBuilderMode.portrait &&
+            (orientation == Orientation.landscape ||
+                mode == OrientationLayoutBuilderMode.landscape)) {
           if (landscape != null) {
             return landscape!(context);
           }
@@ -90,6 +93,7 @@ class ResponsiveLayout extends StatelessWidget {
   final SizeInfoWidgetBuilder? mobile;
   final SizeInfoWidgetBuilder? tabletPortrait;
   final SizeInfoWidgetBuilder? tabletLandscapeDesktop;
+  final bool preferDesktop;
 
   ResponsiveLayout.screenType({
     super.key,
@@ -97,16 +101,19 @@ class ResponsiveLayout extends StatelessWidget {
     this.mobile,
     this.tabletPortrait,
     this.tabletLandscapeDesktop,
+    this.preferDesktop = ResponsiveAppUtil.preferDesktop,
   });
 
   ResponsiveLayout.maybeSidebar({
     super.key,
-    required SizeInfoWidgetBuilder trueBuilder,
-    SizeInfoWidgetBuilder? falseBuilder,
-  })  : breakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints,
-        mobile = falseBuilder,
-        tabletLandscapeDesktop = trueBuilder,
-        tabletPortrait = null;
+    required SizeInfoWidgetBuilder wideSidebarBuilder,
+    SizeInfoWidgetBuilder? narrowSidebarBuilder,
+    SizeInfoWidgetBuilder? noSideBarBuilder,
+    this.breakpoints,
+    this.preferDesktop = ResponsiveAppUtil.preferDesktop,
+  })  : mobile = noSideBarBuilder,
+        tabletLandscapeDesktop = wideSidebarBuilder,
+        tabletPortrait = narrowSidebarBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +125,7 @@ class ResponsiveLayout extends StatelessWidget {
           mobile: mobile,
           tabletPortrait: tabletPortrait,
           tabletLandscapeDesktop: tabletLandscapeDesktop,
+          preferDesktop: preferDesktop,
         );
       },
     );
@@ -198,9 +206,11 @@ class LocalWidgetSizeBuilder extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < breakPoint) {
-          return narrow(context, Size(constraints.maxWidth, constraints.maxHeight));
+          return narrow(
+              context, Size(constraints.maxWidth, constraints.maxHeight));
         } else {
-          return wide(context, Size(constraints.maxWidth, constraints.maxHeight));
+          return wide(
+              context, Size(constraints.maxWidth, constraints.maxHeight));
         }
       },
     );
@@ -226,11 +236,13 @@ class LocalWidgetSizesBuilder extends StatelessWidget {
       builder: (context, constraints) {
         for (int i = 0; i < breakPoints.length; i++) {
           if (constraints.maxWidth < breakPoints[i]) {
-            return builders[i](context, Size(constraints.maxWidth, constraints.maxHeight));
+            return builders[i](
+                context, Size(constraints.maxWidth, constraints.maxHeight));
           }
         }
 
-        return builders.last(context, Size(constraints.maxWidth, constraints.maxHeight));
+        return builders.last(
+            context, Size(constraints.maxWidth, constraints.maxHeight));
       },
     );
   }

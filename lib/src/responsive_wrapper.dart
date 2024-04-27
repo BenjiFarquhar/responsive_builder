@@ -7,14 +7,13 @@ class ResponsiveApp extends StatelessWidget {
   /// Tells ResponsiveApp if we prefer desktop or mobile when a layout is not supplied
   final bool preferDesktop;
 
-  const ResponsiveApp({Key? key, required this.builder, this.preferDesktop = true}) : super(key: key);
+  const ResponsiveApp({Key? key, required this.builder, this.preferDesktop = ResponsiveAppUtil.preferDesktop}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return OrientationBuilder(builder: (context, orientation) {
         ResponsiveAppUtil.setScreenSize(constraints, orientation);
-        ResponsiveAppUtil.preferDesktop = preferDesktop;
         return builder(context);
       });
     });
@@ -40,7 +39,7 @@ extension ResponsiveAppExtensions on num {
 class ResponsiveAppUtil {
   static late double height;
   static late double width;
-  static bool preferDesktop = true;
+  static const bool preferDesktop = true;
 
   /// Saves the screenSzie for access through the extensions later
   static void setScreenSize(

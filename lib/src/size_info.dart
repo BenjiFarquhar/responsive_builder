@@ -27,6 +27,18 @@ class SizeInfo {
 
   bool get isSmall => refinedSize == RefinedSize.small;
 
+    Widget maybeSidebarBuilder(
+    BuildContext context, {
+    required SizeInfoWidgetBuilder trueBuilder,
+    SizeInfoWidgetBuilder? falseBuilder,
+    bool preferDesktop = ResponsiveAppUtil.preferDesktop,
+  }) {
+    return screenTypeLayoutBuilder(context,
+        mobile: falseBuilder,
+        tabletLandscapeDesktop: trueBuilder,
+        preferDesktop: preferDesktop);
+  }
+
   const SizeInfo({
     required this.deviceScreenType,
     required this.refinedSize,
@@ -72,17 +84,17 @@ class SizeInfo {
   };
 
   static const _maxSideBarWidthTablet = {
+    RefinedSize.small: 330,
+    RefinedSize.normal: 340,
+    RefinedSize.large: 350,
+    RefinedSize.extraLarge: 360,
+  };
+
+  static const _maxSideBarWidthDesktop = {
     RefinedSize.small: 370,
     RefinedSize.normal: 380,
     RefinedSize.large: 390,
     RefinedSize.extraLarge: 400,
-  };
-
-  static const _maxSideBarWidthDesktop = {
-    RefinedSize.small: 410,
-    RefinedSize.normal: 420,
-    RefinedSize.large: 430,
-    RefinedSize.extraLarge: 440,
   };
 
   static const RefinedBreakpoints customRefinedBreakpoints = RefinedBreakpoints(
@@ -239,6 +251,7 @@ class SizeInfo {
     SizeInfoWidgetBuilder? mobile,
     SizeInfoWidgetBuilder? tabletPortrait,
     SizeInfoWidgetBuilder? tabletLandscapeDesktop,
+    bool preferDesktop = ResponsiveAppUtil.preferDesktop,
   }) {
     final orientation = MediaQuery.orientationOf(context);
 
@@ -256,7 +269,7 @@ class SizeInfo {
       if (mobile != null) return mobile(context, this);
     }
 
-    final buildDesktopLayout = ResponsiveAppUtil.preferDesktop && tabletLandscapeDesktop != null;
+    final buildDesktopLayout = preferDesktop && tabletLandscapeDesktop != null;
 
     return buildDesktopLayout ? tabletLandscapeDesktop(context, this) : mobile!(context, this);
   }
