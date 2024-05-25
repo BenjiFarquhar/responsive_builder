@@ -247,26 +247,3 @@ class LocalWidgetSizesBuilder extends StatelessWidget {
     );
   }
 }
-
-class LocalWidgetSizesButtonBuilder extends StatelessWidget {
-  final LocalSizeWidgetBuilder xs;
-  final LocalSizeWidgetBuilder sm;
-  final LocalSizeWidgetBuilder md;
-  final LocalSizeWidgetBuilder lg;
-
-  const LocalWidgetSizesButtonBuilder({
-    required this.xs,
-    required this.sm,
-    required this.md,
-    required this.lg,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LocalWidgetSizesBuilder(
-      breakPoints: const [528, 700, 1200],
-      builders: [xs, sm, md, lg],
-    );
-  }
-}

@@ -29,13 +29,15 @@ class SizeInfo {
 
     Widget maybeSidebarBuilder(
     BuildContext context, {
-    required SizeInfoWidgetBuilder trueBuilder,
-    SizeInfoWidgetBuilder? falseBuilder,
+    required SizeInfoWidgetBuilder wideSidebarBuilder,
+    SizeInfoWidgetBuilder? narrowSidebarBuilder,
+    SizeInfoWidgetBuilder? noSideBarBuilder,
     bool preferDesktop = ResponsiveAppUtil.preferDesktop,
   }) {
     return screenTypeLayoutBuilder(context,
-        mobile: falseBuilder,
-        tabletLandscapeDesktop: trueBuilder,
+        mobile: noSideBarBuilder,
+        tabletLandscapeDesktop: wideSidebarBuilder,
+        tabletPortrait: narrowSidebarBuilder,
         preferDesktop: preferDesktop);
   }
 
