@@ -58,8 +58,7 @@ class ResponsiveSizingConfig {
     }
   }
 
-  ScreenBreakpoints get breakpoints =>
-      _customBreakPoints ?? defaultBreakPoints;
+  ScreenBreakpoints get breakpoints => _customBreakPoints ?? defaultBreakPoints;
 
   RefinedBreakpoints get refinedBreakpoints =>
       _customRefinedBreakPoints ?? _defaultRefinedBreakPoints;

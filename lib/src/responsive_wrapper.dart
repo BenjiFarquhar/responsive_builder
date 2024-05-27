@@ -7,7 +7,11 @@ class ResponsiveApp extends StatelessWidget {
   /// Tells ResponsiveApp if we prefer desktop or mobile when a layout is not supplied
   final bool preferDesktop;
 
-  const ResponsiveApp({Key? key, required this.builder, this.preferDesktop = ResponsiveAppUtil.preferDesktop}) : super(key: key);
+  const ResponsiveApp(
+      {Key? key,
+      required this.builder,
+      this.preferDesktop = ResponsiveAppUtil.preferDesktop})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,90 +1,94 @@
 import 'package:flutter/material.dart';
-
 import 'package:responsive_builder/responsive_builder.dart' hide WidgetBuilder;
 
-/// Contains sizing information to make responsive choices for the current screen
-class SizeInfo {
-  final DeviceScreenType deviceScreenType;
-  final RefinedSize refinedSize;
-  final Size screenSize;
-  final Size localWidgetSize;
+/// Manually define refined breakpoints
+///
+/// Overrides the defaults
+class RefinedBreakpoints {
+  final double mobileSmall;
+  final double mobileNormal;
+  final double mobileLarge;
+  final double mobileExtraLarge;
 
-  bool get isMobile => deviceScreenType == DeviceScreenType.mobile;
+  final double tabletSmall;
+  final double tabletNormal;
+  final double tabletLarge;
+  final double tabletExtraLarge;
 
-  bool get isTablet => deviceScreenType == DeviceScreenType.tablet;
+  final double desktopSmall;
+  final double desktopNormal;
+  final double desktopLarge;
+  final double desktopExtraLarge;
 
-  bool get isDesktop => deviceScreenType == DeviceScreenType.desktop;
-
-  bool get isWatch => deviceScreenType == DeviceScreenType.watch;
-
-  // Refined
-
-  bool get isExtraLarge => refinedSize == RefinedSize.extraLarge;
-
-  bool get isLarge => refinedSize == RefinedSize.large;
-
-  bool get isNormal => refinedSize == RefinedSize.normal;
-
-  bool get isSmall => refinedSize == RefinedSize.small;
-
-    Widget maybeSidebarBuilder(
-    BuildContext context, {
-    required SizeInfoWidgetBuilder wideSidebarBuilder,
-    SizeInfoWidgetBuilder? narrowSidebarBuilder,
-    SizeInfoWidgetBuilder? noSideBarBuilder,
-    bool preferDesktop = ResponsiveAppUtil.preferDesktop,
-  }) {
-    return screenTypeLayoutBuilder(context,
-        mobile: noSideBarBuilder,
-        tabletLandscapeDesktop: wideSidebarBuilder,
-        tabletPortrait: narrowSidebarBuilder,
-        preferDesktop: preferDesktop);
-  }
-
-  const SizeInfo({
-    required this.deviceScreenType,
-    required this.refinedSize,
-    required this.screenSize,
-    required this.localWidgetSize,
+  const RefinedBreakpoints({
+    this.mobileSmall = 320,
+    this.mobileNormal = 375,
+    this.mobileLarge = 414,
+    this.mobileExtraLarge = 480,
+    this.tabletSmall = 600,
+    this.tabletNormal = 768,
+    this.tabletLarge = 850,
+    this.tabletExtraLarge = 900,
+    this.desktopSmall = 950,
+    this.desktopNormal = 1920,
+    this.desktopLarge = 3840,
+    this.desktopExtraLarge = 4096,
   });
-
-  factory SizeInfo.of(BuildContext context, {screenBreakpoints = ResponsiveSizingConfig.sidebarLayoutBreakpoints}) {
-    final size = MediaQuery.sizeOf(context);
-
-    return SizeInfo(
-      deviceScreenType: getDeviceType(size, screenBreakpoints),
-      refinedSize: getRefinedSize(size),
-      screenSize: size,
-      localWidgetSize: const Size(0, 0),
-    );
-  }
 
   @override
   String toString() {
-    return 'DeviceType:$deviceScreenType RefinedSize:$refinedSize ScreenSize:$screenSize LocalWidgetSize:$localWidgetSize';
+    return "Desktop: Small - $desktopSmall Normal - $desktopNormal Large - $desktopLarge ExtraLarge - $desktopExtraLarge" +
+        "\nTablet: Small - $tabletSmall Normal - $tabletNormal Large - $tabletLarge ExtraLarge - $tabletExtraLarge" +
+        "\nMobile: Small - $mobileSmall Normal - $mobileNormal Large - $mobileLarge ExtraLarge - $mobileExtraLarge";
   }
+}
 
+/// Manually define screen resolution breakpoints
+///
+/// Overrides the defaults
+class ScreenBreakpoints {
+  static const ScreenBreakpoints customBreakpoints = ScreenBreakpoints(
+    desktop: 950,
+    tablet: 600,
+    watch: 300,
+  );
+  final double watch;
+  final double tablet;
+
+  final double desktop;
+
+  const ScreenBreakpoints({
+    required this.desktop,
+    required this.tablet,
+    required this.watch,
+  });
+
+  @override
+  String toString() {
+    return "Desktop: $desktop, Tablet: $tablet, Watch: $watch";
+  }
+}
+
+/// Contains sizing information to make responsive choices for the current screen
+class SizeInfo {
   static const _maxColumnWidthMobile = {
     RefinedSize.small: 470,
     RefinedSize.normal: 480,
     RefinedSize.large: 490,
     RefinedSize.extraLarge: 500,
   };
-
   static const _maxColumnWidthTablet = {
     RefinedSize.small: 510,
     RefinedSize.normal: 520,
     RefinedSize.large: 530,
     RefinedSize.extraLarge: 540,
   };
-
   static const _maxColumnWidthDesktop = {
     RefinedSize.small: 550,
     RefinedSize.normal: 560,
     RefinedSize.large: 570,
     RefinedSize.extraLarge: 580,
   };
-
   static const _maxSideBarWidthTablet = {
     RefinedSize.small: 330,
     RefinedSize.normal: 340,
@@ -116,6 +120,60 @@ class SizeInfo {
     mobileNormal: 375,
     mobileSmall: 320,
   );
+
+  final DeviceScreenType deviceScreenType;
+
+  final RefinedSize refinedSize;
+
+  final Size screenSize;
+
+  final Size localWidgetSize;
+
+  const SizeInfo({
+    required this.deviceScreenType,
+    required this.refinedSize,
+    required this.screenSize,
+    required this.localWidgetSize,
+  });
+
+  factory SizeInfo.of(BuildContext context,
+      {screenBreakpoints = ResponsiveSizingConfig.defaultBreakPoints}) {
+    final size = MediaQuery.sizeOf(context);
+
+    return SizeInfo(
+      deviceScreenType: getDeviceType(size, screenBreakpoints),
+      refinedSize: getRefinedSize(size),
+      screenSize: size,
+      localWidgetSize: const Size(0, 0),
+    );
+  }
+
+  bool get isDesktop => deviceScreenType == DeviceScreenType.desktop;
+
+  // Refined
+
+  bool get isExtraLarge => refinedSize == RefinedSize.extraLarge;
+
+  bool get isLarge => refinedSize == RefinedSize.large;
+
+  bool get isMobile => deviceScreenType == DeviceScreenType.mobile;
+
+  bool get isNormal => refinedSize == RefinedSize.normal;
+
+  bool get isNotSidebarSize {
+    return screenSize.width <=
+        ResponsiveSizingConfig.sidebarLayoutBreakpoints.tablet;
+  }
+
+  bool get isSidebarSize {
+    return !isNotSidebarSize;
+  }
+
+  bool get isSmall => refinedSize == RefinedSize.small;
+
+  bool get isTablet => deviceScreenType == DeviceScreenType.tablet;
+
+  bool get isWatch => deviceScreenType == DeviceScreenType.watch;
 
   double get maxColumnWidth => _maxLength(
         this,
@@ -211,29 +269,73 @@ class SizeInfo {
   }
 
   bool isMobileLandScape(BuildContext context) {
-    return deviceScreenType == DeviceScreenType.mobile && (SizeUtils.isLandscape(context));
+    return deviceScreenType == DeviceScreenType.mobile &&
+        (SizeUtils.isLandscape(context));
   }
 
   /// Used for screens that have a [VpTopNavBar]
-  bool isNarrowScreen(BuildContext context) => (isMobile || (isTabletPortrait(context)));
+  bool isNarrowScreen(BuildContext context) =>
+      (isMobile || (isTabletPortrait(context)));
 
   bool isTabletLandscape(BuildContext context) {
-    return deviceScreenType == DeviceScreenType.tablet && (SizeUtils.isLandscape(context));
+    return deviceScreenType == DeviceScreenType.tablet &&
+        (SizeUtils.isLandscape(context));
   }
 
   bool isTabletPortrait(BuildContext context) {
-    return deviceScreenType == DeviceScreenType.tablet && (SizeUtils.isPortrait(context));
+    return deviceScreenType == DeviceScreenType.tablet &&
+        (SizeUtils.isPortrait(context));
   }
 
   /// Used for screens that have a [VpBottomNavBar]
   bool isWideScreen(BuildContext context) => !isNarrowScreen(context);
 
-  bool get isNotSidebarSize {
-    return screenSize.width <= ResponsiveSizingConfig.sidebarLayoutBreakpoints.tablet;
+  Widget maybeSidebarBuilder(
+    BuildContext context, {
+    required SizeInfoWidgetBuilder wideSidebarBuilder,
+    SizeInfoWidgetBuilder? narrowSidebarBuilder,
+    SizeInfoWidgetBuilder? noSideBarBuilder,
+    bool preferDesktop = ResponsiveAppUtil.preferDesktop,
+  }) {
+    return screenTypeLayoutBuilder(context,
+        mobile: noSideBarBuilder,
+        tabletLandscapeDesktop: wideSidebarBuilder,
+        tabletPortrait: narrowSidebarBuilder,
+        preferDesktop: preferDesktop);
   }
 
-  bool get isSidebarSize {
-    return !isNotSidebarSize;
+  Widget screenTypeLayoutBuilder(
+    context, {
+    SizeInfoWidgetBuilder? mobile,
+    SizeInfoWidgetBuilder? tabletPortrait,
+    SizeInfoWidgetBuilder? tabletLandscapeDesktop,
+    bool preferDesktop = ResponsiveAppUtil.preferDesktop,
+  }) {
+    final orientation = MediaQuery.orientationOf(context);
+
+    if (deviceScreenType == DeviceScreenType.desktop ||
+        deviceScreenType == DeviceScreenType.tablet &&
+            orientation == Orientation.landscape) {
+      if (tabletLandscapeDesktop != null)
+        return tabletLandscapeDesktop(context, this);
+
+      if (tabletPortrait != null) return tabletPortrait(context, this);
+    }
+
+    if (deviceScreenType == DeviceScreenType.tablet &&
+        orientation == Orientation.portrait) {
+      if (tabletPortrait != null) return tabletPortrait(context, this);
+    }
+
+    if (deviceScreenType == DeviceScreenType.mobile) {
+      if (mobile != null) return mobile(context, this);
+    }
+
+    final buildDesktopLayout = preferDesktop && tabletLandscapeDesktop != null;
+
+    return buildDesktopLayout
+        ? tabletLandscapeDesktop(context, this)
+        : mobile!(context, this);
   }
 
   Widget? screenWidthBuilder(
@@ -248,32 +350,9 @@ class SizeInfo {
     }
   }
 
-  Widget screenTypeLayoutBuilder(
-    context, {
-    SizeInfoWidgetBuilder? mobile,
-    SizeInfoWidgetBuilder? tabletPortrait,
-    SizeInfoWidgetBuilder? tabletLandscapeDesktop,
-    bool preferDesktop = ResponsiveAppUtil.preferDesktop,
-  }) {
-    final orientation = MediaQuery.orientationOf(context);
-
-    if (deviceScreenType == DeviceScreenType.desktop || deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.landscape) {
-      if (tabletLandscapeDesktop != null) return tabletLandscapeDesktop(context, this);
-
-      if (tabletPortrait != null) return tabletPortrait(context, this);
-    }
-
-    if (deviceScreenType == DeviceScreenType.tablet && orientation == Orientation.portrait) {
-      if (tabletPortrait != null) return tabletPortrait(context, this);
-    }
-
-    if (deviceScreenType == DeviceScreenType.mobile) {
-      if (mobile != null) return mobile(context, this);
-    }
-
-    final buildDesktopLayout = preferDesktop && tabletLandscapeDesktop != null;
-
-    return buildDesktopLayout ? tabletLandscapeDesktop(context, this) : mobile!(context, this);
+  @override
+  String toString() {
+    return 'DeviceType:$deviceScreenType RefinedSize:$refinedSize ScreenSize:$screenSize LocalWidgetSize:$localWidgetSize';
   }
 
   /// Max landscape column width tablet
@@ -344,80 +423,17 @@ class SizeInfo {
       // width
       maxLength = maxWidths[size ?? sizingInfo.refinedSize]!.toDouble();
 
-      return (sizingInfo.localWidgetSize.width != 0 && sizingInfo.localWidgetSize.width < maxLength) ? sizingInfo.localWidgetSize.width : maxLength.toDouble();
+      return (sizingInfo.localWidgetSize.width != 0 &&
+              sizingInfo.localWidgetSize.width < maxLength)
+          ? sizingInfo.localWidgetSize.width
+          : maxLength.toDouble();
     } else {
       // height
       //do not use this
-      return sizingInfo.localWidgetSize.height < maxLength ? sizingInfo.localWidgetSize.height : maxLength.toDouble();
+      return sizingInfo.localWidgetSize.height < maxLength
+          ? sizingInfo.localWidgetSize.height
+          : maxLength.toDouble();
     }
-  }
-}
-
-/// Manually define screen resolution breakpoints
-///
-/// Overrides the defaults
-class ScreenBreakpoints {
-  final double watch;
-  final double tablet;
-  final double desktop;
-
-  const ScreenBreakpoints({
-    required this.desktop,
-    required this.tablet,
-    required this.watch,
-  });
-
-  @override
-  String toString() {
-    return "Desktop: $desktop, Tablet: $tablet, Watch: $watch";
-  }
-
-  static const ScreenBreakpoints customBreakpoints = ScreenBreakpoints(
-    desktop: 950,
-    tablet: 600,
-    watch: 300,
-  );
-}
-
-/// Manually define refined breakpoints
-///
-/// Overrides the defaults
-class RefinedBreakpoints {
-  final double mobileSmall;
-  final double mobileNormal;
-  final double mobileLarge;
-  final double mobileExtraLarge;
-
-  final double tabletSmall;
-  final double tabletNormal;
-  final double tabletLarge;
-  final double tabletExtraLarge;
-
-  final double desktopSmall;
-  final double desktopNormal;
-  final double desktopLarge;
-  final double desktopExtraLarge;
-
-  const RefinedBreakpoints({
-    this.mobileSmall = 320,
-    this.mobileNormal = 375,
-    this.mobileLarge = 414,
-    this.mobileExtraLarge = 480,
-    this.tabletSmall = 600,
-    this.tabletNormal = 768,
-    this.tabletLarge = 850,
-    this.tabletExtraLarge = 900,
-    this.desktopSmall = 950,
-    this.desktopNormal = 1920,
-    this.desktopLarge = 3840,
-    this.desktopExtraLarge = 4096,
-  });
-
-  @override
-  String toString() {
-    return "Desktop: Small - $desktopSmall Normal - $desktopNormal Large - $desktopLarge ExtraLarge - $desktopExtraLarge" +
-        "\nTablet: Small - $tabletSmall Normal - $tabletNormal Large - $tabletLarge ExtraLarge - $tabletExtraLarge" +
-        "\nMobile: Small - $mobileSmall Normal - $mobileNormal Large - $mobileLarge ExtraLarge - $mobileExtraLarge";
   }
 }
 
@@ -429,7 +445,8 @@ class SizeUtils {
     return deviceType == DeviceScreenType.desktop;
   }
 
-  static bool isLandscape(BuildContext context) => MediaQuery.of(context).orientation == Orientation.landscape;
+  static bool isLandscape(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.landscape;
 
   /// For when you don't have [SizeInfo]
   static bool isMobile(BuildContext context) {
@@ -443,7 +460,9 @@ class SizeUtils {
     BuildContext? context,
     SizeInfo? sizeInfo,
   ]) {
-    final deviceType = sizeInfo != null ? sizeInfo.deviceScreenType : getDeviceType(MediaQuery.of(context!).size);
+    final deviceType = sizeInfo != null
+        ? sizeInfo.deviceScreenType
+        : getDeviceType(MediaQuery.of(context!).size);
 
     return deviceType == DeviceScreenType.mobile && (isLandscape(context!));
   }
@@ -465,7 +484,8 @@ class SizeUtils {
   /// For when you don't have [SizeInfo]
   static bool isNotTablet(BuildContext? context) => !isTablet(context);
 
-  static bool isPortrait(BuildContext context) => MediaQuery.of(context).orientation == Orientation.portrait;
+  static bool isPortrait(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.portrait;
 
   /// For when you don't have [SizeInfo]
   static bool isTablet(context) {
